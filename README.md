@@ -21,14 +21,14 @@ In order to get started, you need to follow the steps below for the initial conf
 * Add the background service that will initiate the synchornization and syncer provider to your AndroidManifest.xml.
 * Configure sync adapter settings.
 
-### 1. Google APIs Access
+### Google APIs Access
 Go to [APIs console](https://code.google.com/apis/console) and create a project if you haven't already. On the "API Access" tab, create a new client ID for installed apps and select Android. Provide your package name and certificate finger print. You can extract SHA1 footprint by executing the following command:
 
     $ keytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore -list -v
 
 Our Android quickstart explains the flow more in detail on  [Google Developers](https://developers.google.com/drive/quickstart-android).
 
-### 2. Add Sync to your AndroidManifest.xml
+### Add Sync to your AndroidManifest.xml
 
 Add the background service and the syncer provider to your `AndroidManifest.xml` file.
 
@@ -53,7 +53,7 @@ Add the background service and the syncer provider to your `AndroidManifest.xml`
         </provider>
         <!-- end of appdata preferences -->
 
-### 3. Configure Adapter Settings
+### Configure Adapter Settings
         
 Create an new XML resource (`@xml/syncadapter` ), and modify it to configure your sync adapter settings. A sample adapter is below:
  
