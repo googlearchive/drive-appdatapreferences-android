@@ -72,6 +72,17 @@ public class AppdataPreferencesSyncer {
   private AppdataPreferencesSyncer(Context context) {
     mContext = context;
   }
+  
+  /**
+   * Binds a {@code SharedPreferences} object to a Google account.
+   * @param credential  Google account credentials.
+   * @param preferences Preferences to be bound to the Google account.
+   */
+  public void bind(GoogleAccountCredential credential,
+      SharedPreferences preferences) {
+    setCredential(credential);
+    setPreferences(preferences);
+  }
 
   /**
    * Syncs the preferences file with an appdata preferences file.
