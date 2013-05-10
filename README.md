@@ -4,8 +4,10 @@
 
 The sample below illustrates to how bind a Google account to a shared preferences instance. Once you're all set, sharedPreferences key/values will be synced to user's Google Drive, under your application's folder.
 
-    syncer = AppdataPreferencesSyncer.get(context);
-    syncer.bind(googleAccountCredential, sharedPreferences);
+~~~~~ java
+syncer = AppdataPreferencesSyncer.get(context);
+syncer.bind(googleAccountCredential, sharedPreferences);
+~~~~~
 
 ### What can I do with AppdataPreferences?
 
@@ -32,82 +34,98 @@ Our Android quickstart explains the flow more in detail on  [Google Developers](
 
 Add the background service and the syncer provider to your `AndroidManifest.xml` file.
 
-    <application...
+~~~~~ xml
+<application...
 
-        <!-- appdatapreferences -->
-        <service
-            android:name="com.google.drive.appdatapreferences.AppdataSyncerService"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter" />
-        </service>
-        <provider
-            android:name="com.google.drive.appdatapreferences.AppdataPreferencesProvider"
-            android:authorities="com.google.drive.appdatapreferences"
-            android:exported="false" >
-            <grant-uri-permission android:pathPattern=".*" />
-        </provider>
-        <!-- end of appdata preferences -->
+    <!-- appdatapreferences -->
+    <service
+        android:name="com.google.drive.appdatapreferences.AppdataSyncerService"
+        android:exported="false" >
+        <intent-filter>
+            <action android:name="android.content.SyncAdapter" />
+        </intent-filter>
+        <meta-data
+            android:name="android.content.SyncAdapter"
+            android:resource="@xml/syncadapter" />
+    </service>
+    <provider
+        android:name="com.google.drive.appdatapreferences.AppdataPreferencesProvider"
+        android:authorities="com.google.drive.appdatapreferences"
+        android:exported="false" >
+        <grant-uri-permission android:pathPattern=".*" />
+    </provider>
+    <!-- end of appdata preferences -->
+~~~~~
 
 ### Configure Adapter Settings
         
 Create an new XML resource (`@xml/syncadapter` ), and modify it to configure your sync adapter settings. A sample adapter is below:
- 
-    <?xml version="1.0" encoding="utf-8"?>
-    <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
-        android:contentAuthority="com.google.drive.appdatapreferences" 
-        android:accountType="com.google"
-        android:userVisible="true"
-        android:isAlwaysSyncable="true"
-        android:supportsUploading="true" />
+
+~~~~~ xml
+<?xml version="1.0" encoding="utf-8"?>
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+    android:contentAuthority="com.google.drive.appdatapreferences" 
+    android:accountType="com.google"
+    android:userVisible="true"
+    android:isAlwaysSyncable="true"
+    android:supportsUploading="true" />
+~~~~~
 
 ## Authorize and Authenticate
 Authorization and authentication is handled by Google Play Service's auth modules. To learn the basics, please read the [official Android SDK documentaion for Google Play Services](http://developer.android.com/reference/com/google/android/gms/auth/GoogleAuthUtil.html).
 
 Initialize a `GoogleAccountCredential` with drive.appdata scope and let user to pick a Google Account to use.
 
-    GoogleAccountCredential credential =
-        GoogleAccountCredential.usingOAuth2(this, "https://www.googleapis.com/auth/drive.appdata");
-    credential.setSelectedAccountName(getGoogleAccountName());
+~~~~~ java
+GoogleAccountCredential credential =
+    GoogleAccountCredential.usingOAuth2(this, "https://www.googleapis.com/auth/drive.appdata");
+credential.setSelectedAccountName(getGoogleAccountName());
+~~~~~
 
 ## Synchronize
 
 Once you configure you application to use the sync library, as explained in the Configuration section, you need to bind an account to a shared preferences instance:
 
-    AppdataPreferences preferences =
-        AppdataPreferences.get(getApplicationContext());
-    syncer.bind(googleAccountCredential, sharedPreferences);
+~~~~~ java
+AppdataPreferences preferences =
+    AppdataPreferences.get(getApplicationContext());
+syncer.bind(googleAccountCredential, sharedPreferences);
+~~~~~
 
 Use `syncer.sync` to force sync. It's useful to retrieve the remote preferences initially when application first launches.
 
-    syncer.sync();
+~~~~~ java
+syncer.sync();
+~~~~~
 
 Listen remote changes by setting syncer an `onChangeListener`.
 
-    syncer.setOnChangeListener(new OnChangeListener() {
-      @Override
-      public void onChange(SharedPreferences prefs) {
-        // preferences are changed
-      }
-    });
-    
+~~~~~ java
+syncer.setOnChangeListener(new OnChangeListener() {
+  @Override
+  public void onChange(SharedPreferences prefs) {
+    // preferences are changed
+  }
+});
+~~~~~
+
 If background service recieves authorization errors, you can listen them by setting a `OnUserRecoverableAuthExceptionListener`.
 
-    syncer.setOnUserRecoverableAuthExceptionListener(new OnUserRecoverableAuthExceptionListener(){
-      @Override
-      public void onUserRecoverableAuthException(final UserRecoverableAuthIOException e) {
-        // show user a notification to ask for permissions again.
-      }
-    });
+~~~~~ java
+syncer.setOnUserRecoverableAuthExceptionListener(new OnUserRecoverableAuthExceptionListener(){
+  @Override
+  public void onUserRecoverableAuthException(final UserRecoverableAuthIOException e) {
+    // show user a notification to ask for permissions again.
+  }
+});
+~~~~~
 
 ## Manage Synchronization
 
 Start/stop synchnonization manually.
 
-    syncer.getSyncManager().startSync();
-    syncer.getSyncManager().stopSync();
-    syncer.getSyncManager().startPeriodicSync(); // reschedules syncer
+~~~~~ java
+  syncer.getSyncManager().startSync();
+  syncer.getSyncManager().stopSync();
+  syncer.getSyncManager().startPeriodicSync(); // reschedules syncer
+~~~~~
