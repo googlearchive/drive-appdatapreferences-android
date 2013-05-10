@@ -16,7 +16,7 @@ Some of the common use cases you can easily implement by using this library are:
 * Sharing application preferences and application state among user's different machines.
 * Distributing content or altering application behavior by modifying user's preferences files.
 
-## Configuration
+## Configure
 
 In order to get started, you need to follow the steps below for the initial configuration.
 * Setup Google APIs access for your Android application.
@@ -35,8 +35,8 @@ Our Android quickstart explains the flow more in detail on  [Google Developers](
 Add the background service and the syncer provider to your `AndroidManifest.xml` file.
 
 ~~~~~ xml
-<application...
-
+<application>
+    ...
     <!-- appdatapreferences -->
     <service
         android:name="com.google.drive.appdatapreferences.AppdataSyncerService"
