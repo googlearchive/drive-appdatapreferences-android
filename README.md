@@ -9,28 +9,28 @@ syncer = AppdataPreferencesSyncer.get(context);
 syncer.bind(googleAccountCredential, sharedPreferences);
 ~~~~~
 
-### What can I do with AppdataPreferences?
+## What can I do with AppdataPreferences?
 
 Some of the common use cases you can easily implement by using this library are:
 * Backing up your application preferences on the cloud.
 * Sharing application preferences and application state among user's different machines.
 * Distributing content or altering application behavior by modifying user's preferences files.
 
-## Configure
+### Configure
 
 In order to get started, you need to follow the steps below for the initial configuration.
 * Setup Google APIs access for your Android application.
 * Add the background service that will initiate the synchornization and syncer provider to your AndroidManifest.xml.
 * Configure sync adapter settings.
 
-### Google APIs Access
+#### Google APIs Access
 Go to [APIs console](https://code.google.com/apis/console) and create a project if you haven't already. On the "API Access" tab, create a new client ID for installed apps and select Android. Provide your package name and certificate finger print. You can extract SHA1 footprint by executing the following command:
 
     $ keytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore -list -v
 
 Our Android quickstart explains the flow more in detail on  [Google Developers](https://developers.google.com/drive/quickstart-android).
 
-### Add Sync to your AndroidManifest.xml
+#### Add Sync to your AndroidManifest.xml
 
 Add the background service and the syncer provider to your `AndroidManifest.xml` file.
 
@@ -57,7 +57,7 @@ Add the background service and the syncer provider to your `AndroidManifest.xml`
     <!-- end of appdata preferences -->
 ~~~~~
 
-### Configure Adapter Settings
+#### Configure Adapter Settings
         
 Create an new XML resource (`@xml/syncadapter` ), and modify it to configure your sync adapter settings. A sample adapter is below:
 
@@ -71,7 +71,7 @@ Create an new XML resource (`@xml/syncadapter` ), and modify it to configure you
     android:supportsUploading="true" />
 ~~~~~
 
-## Authorize and Authenticate
+### Authorize and Authenticate
 Authorization and authentication is handled by Google Play Service's auth modules. To learn the basics, please read the [official Android SDK documentaion for Google Play Services](http://developer.android.com/reference/com/google/android/gms/auth/GoogleAuthUtil.html).
 
 Initialize a `GoogleAccountCredential` with drive.appdata scope and let user to pick a Google Account to use.
@@ -82,7 +82,7 @@ GoogleAccountCredential credential =
 credential.setSelectedAccountName(getGoogleAccountName());
 ~~~~~
 
-## Synchronize
+### Synchronize
 
 Once you configure you application to use the sync library, as explained in the Configuration section, you need to bind an account to a shared preferences instance:
 
@@ -120,7 +120,7 @@ syncer.setOnUserRecoverableAuthExceptionListener(new OnUserRecoverableAuthExcept
 });
 ~~~~~
 
-## Manage Synchronization
+### Manage Synchronization
 
 Start/stop synchnonization manually.
 
