@@ -130,7 +130,7 @@ Start/stop synchnonization manually.
   syncer.getSyncManager().startPeriodicSync(); // reschedules syncer
 ~~~~~
 
-A working sample application is available on [appdatapreferences-android-bootstrap](https://github.com/googledrive/appdatapreferences-android-bootstrap).
+A working sample application is available on [appdatapreferences-android-quickstart](https://github.com/googledrive/appdatapreferences-android-quickstart).
 
 ## License
 
