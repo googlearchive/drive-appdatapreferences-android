@@ -103,7 +103,7 @@ public class AppdataPreferencesSyncer {
     Map<String, ?> values = mPreferences.getAll();
     String localJson = GSON.toJson(values);
     try {
-      if (localJson != null && !localJson.equals(mLastSyncedJson)) {
+      if (values.size() > 0 && localJson != null && !localJson.equals(mLastSyncedJson)) {
         updateRemote(localJson);
       } else {
         updateLocal();
