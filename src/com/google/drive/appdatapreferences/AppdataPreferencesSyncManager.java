@@ -46,7 +46,10 @@ public class AppdataPreferencesSyncManager {
    */
   public AppdataPreferencesSyncManager(Account account, Bundle params) {
     mAccount = account;
-    mParams = params;
+    if(params == null)
+        mParams = new Bundle();
+    else
+        mParams = params;
   }
 
   /**
