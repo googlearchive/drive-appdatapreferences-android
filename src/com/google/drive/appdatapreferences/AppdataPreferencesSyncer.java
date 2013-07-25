@@ -170,19 +170,6 @@ public class AppdataPreferencesSyncer {
    * selected account.
    * @param credential User's credential
    * @param config Configuration parameters
-   */
-  public void setCredential(GoogleAccountCredential credential, Bundle config) {
-    mCredential = credential;
-    mSyncManager = new AppdataPreferencesSyncManager(
-            credential.getSelectedAccount(),config);
-    mSyncManager.startPeriodicSync();
-  }
-
-  /**
-   * Sets the credential and starts a periodic sync for the
-   * selected account.
-   * @param credential User's credential
-   * @param config Configuration parameters
   */
   public void setCredential(GoogleAccountCredential credential, Bundle config) {
     mCredential = credential;
