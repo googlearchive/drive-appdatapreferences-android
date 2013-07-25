@@ -222,7 +222,7 @@ public class AppdataPreferencesSyncer {
    * @throws IOException
    */
   private void updateRemote(String json) throws IOException {
-    Log.d(TAG, "Updating the remote preferences file");
+    ADPLog.d(TAG, "Updating the remote preferences file");
     // update the remote
     new UpdatePreferencesDriveTask(getDriveService()).execute(json);
     mLastSyncedJson = json;
@@ -234,7 +234,7 @@ public class AppdataPreferencesSyncer {
    * @throws IOException
    */
   private void updateLocal() throws IOException {
-    Log.d(TAG, "Updating the local preferences file");
+    ADPLog.d(TAG, "Updating the local preferences file");
     // update the local preferences
     HashMap<String, Object> remoteObj = null;
     String json =

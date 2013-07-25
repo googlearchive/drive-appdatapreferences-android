@@ -42,6 +42,7 @@ public class AppdataPreferencesSyncManager {
         mParams = new Bundle();
     else
         mParams = params;
+    ADPLog.getInstance().setBundle(mParams);
   }
 
   /**

@@ -52,7 +52,7 @@ public class AppdataSyncerAdapter extends AbstractThreadedSyncAdapter {
   public void onPerformSync(
       Account account, Bundle bundle, String authority,
       ContentProviderClient provider, SyncResult syncResult) {
-    Log.d(TAG, "Syncing the preferences....");
+    ADPLog.d(TAG, "Syncing the preferences....");
     // TODO: experiment exponential backoff for erroneous cases.
     // TODO: update syncResult.stats accordingly
     AppdataPreferencesSyncer.get(mContext).sync();
