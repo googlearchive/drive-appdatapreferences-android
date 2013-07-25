@@ -161,10 +161,7 @@ public class AppdataPreferencesSyncer {
    * @param credential User's credential
    */
   public void setCredential(GoogleAccountCredential credential) {
-    mCredential = credential;
-    mSyncManager =
-        new AppdataPreferencesSyncManager(credential.getSelectedAccount());
-    mSyncManager.startPeriodicSync();
+      setCredential(credential,null);
   }
 
   /**
@@ -175,7 +172,8 @@ public class AppdataPreferencesSyncer {
    */
   public void setCredential(GoogleAccountCredential credential, Bundle config) {
     mCredential = credential;
-    mSyncManager = new AppdataPreferencesSyncManager(credential.getSelectedAccount(),config);
+    mSyncManager = new AppdataPreferencesSyncManager(
+            credential.getSelectedAccount(),config);
     mSyncManager.startPeriodicSync();
   }
 
