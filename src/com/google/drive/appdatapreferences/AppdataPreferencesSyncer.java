@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.os.Bundle;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -161,9 +162,19 @@ public class AppdataPreferencesSyncer {
    * @param credential User's credential
    */
   public void setCredential(GoogleAccountCredential credential) {
+      setCredential(credential,null);
+  }
+
+  /**
+   * Sets the credential and starts a periodic sync for the
+   * selected account.
+   * @param credential User's credential
+   * @param config Configuration parameters
+   */
+  public void setCredential(GoogleAccountCredential credential, Bundle config) {
     mCredential = credential;
-    mSyncManager =
-        new AppdataPreferencesSyncManager(credential.getSelectedAccount());
+    mSyncManager = new AppdataPreferencesSyncManager(
+            credential.getSelectedAccount(),config);
     mSyncManager.startPeriodicSync();
   }
 
