@@ -218,7 +218,7 @@ public class AppdataPreferencesSyncer {
     remoteObj = GSON.fromJson(json, type);
     Utils.replaceValues(mPreferences, remoteObj);
     // Notify if there are changes
-    if (json != mLastSyncedJson && mOnChangeListener != null) {
+    if (!json.equals(mLastSyncedJson) && mOnChangeListener != null) {
       mOnChangeListener.onChange(mPreferences);
       mLastSyncedJson = json;
     }
