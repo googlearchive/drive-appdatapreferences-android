@@ -24,7 +24,6 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
@@ -44,6 +43,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public class AppdataPreferencesSyncer {
 
+  public static final String LAST_UPDATE_KEY = "_last_update";
   private static AppdataPreferencesSyncer sInstance;
 
   private final Context mContext;
@@ -53,8 +53,9 @@ public class AppdataPreferencesSyncer {
   private OnUserRecoverableAuthExceptionExceptionListener mOnExceptionListener;
   private AppdataPreferencesSyncManager mSyncManager;
   private String mLastSyncedJson;
+  private AppdataSyncStrategy mSyncStrategy;
 
-  /**
+    /**
    * Gets the singleton {@code AppdataPreferencesSyncer} instance.
    * @param context Context of the application
    */
@@ -71,6 +72,7 @@ public class AppdataPreferencesSyncer {
    */
   private AppdataPreferencesSyncer(Context context) {
     mContext = context;
+    mSyncStrategy = new AppdataDefaultSyncStrategy();
   }
   
   /**
@@ -84,7 +86,11 @@ public class AppdataPreferencesSyncer {
     setPreferences(preferences);
   }
 
-  /**
+    public void setSyncStrategy(AppdataSyncStrategy syncStrategy) {
+        this.mSyncStrategy = syncStrategy;
+    }
+
+    /**
    * Syncs the preferences file with an appdata preferences file.
    *
    * Synchronization steps:
@@ -94,23 +100,58 @@ public class AppdataPreferencesSyncer {
    *    it includes changes, notify that preferences have changed.
    */
   public synchronized void sync() {
-    // TODO: don't silently ignore the sync operation
-    // notify user that preferences and credential are not set.
-    if (mPreferences == null || mCredential == null) {
-      return;
-    }
-    // check if the values are changed since last update
-    Map<String, ?> values = mPreferences.getAll();
-    String localJson = GSON.toJson(values);
-    try {
-      if (localJson != null && !localJson.equals(mLastSyncedJson)) {
-        updateRemote(localJson);
-      } else {
-        updateLocal();
+      // TODO: don't silently ignore the sync operation
+      // notify user that preferences and credential are not set.
+      if (mPreferences == null || mCredential == null) {
+          Log.w(TAG, "Preferences or credential are not set. Skipping synchronization.");
+          return;
       }
-    } catch (IOException e) {
-      handleException(e);
-    }
+
+      // check if the values are changed since last update
+      Map<String, ?> localValues = mPreferences.getAll();
+      String localJson = GSON.toJson(localValues);
+      Log.d(TAG, "Local JSON: " + localJson);
+
+      try {
+          String remoteJson = new GetOrCreatePreferencesDriveTask(getDriveService()).execute();
+          Log.d(TAG, "Remote JSON: " + remoteJson);
+
+          if (remoteJson == null || remoteJson.length() == 0) {
+              Log.d(TAG, "Nothing on remote. Let's populate it.");
+              updateRemote(localJson);
+              return;
+          }
+
+          Type type = new TypeToken<HashMap<String, Object>>(){}.getType();
+          Map<String, Object> remoteValues = GSON.fromJson(remoteJson, type);
+
+          AppdataSyncStrategy.SyncContext context = new AppdataSyncStrategy.SyncContext(
+                  mLastSyncedJson,
+                  remoteJson,
+                  remoteValues,
+                  localJson,
+                  localValues
+          );
+
+          AppdataSyncStrategy.Resolution resolution = mSyncStrategy.getSyncResolution(context);
+          switch (resolution){
+              case DO_NOTHING:
+                  Log.d(TAG, "Nothing to do.");
+                  break;
+              case PUSH_LOCAL_TO_REMOTE:
+                  Log.d(TAG, "Pushing local values to remote");
+                  updateRemote(localJson);
+                  break;
+              case PUSH_REMOTE_TO_LOCAL:
+                  Log.d(TAG, "Pushing remote values to local");
+                  updateLocal(remoteJson, remoteValues);
+                  break;
+              default:
+                  throw new IllegalStateException("Unexpected sync resolution: " + resolution);
+          }
+      } catch (IOException e) {
+          handleException(e);
+      }
   }
 
   /**
@@ -207,29 +248,33 @@ public class AppdataPreferencesSyncer {
    * Updates the local SharedPreferences instance with the remote
    * changes and calls OnChangeListener.
    * @throws IOException
+   * @param remoteJson
    */
-  private void updateLocal() throws IOException {
+  private void updateLocal(String remoteJson) throws IOException {
     Log.d(TAG, "Updating the local preferences file");
     // update the local preferences
     HashMap<String, Object> remoteObj = null;
-    String json =
-        new GetOrCreatePreferencesDriveTask(getDriveService()).execute();
     Type type = new TypeToken<HashMap<String, Object>>() {}.getType();
-    remoteObj = GSON.fromJson(json, type);
+    remoteObj = GSON.fromJson(remoteJson, type);
+    updateLocal(remoteJson, remoteObj);
+  }
+
+  private void updateLocal(String remoteJson, Map<String, Object> remoteObj) {
     Utils.replaceValues(mPreferences, remoteObj);
     // Notify if there are changes
-    if (json != mLastSyncedJson && mOnChangeListener != null) {
+    if (!remoteJson.equals(mLastSyncedJson) && mOnChangeListener != null) {
       mOnChangeListener.onChange(mPreferences);
-      mLastSyncedJson = json;
+      mLastSyncedJson = remoteJson;
     }
   }
 
-  /**
+    /**
    * Handles API exceptions and notifies OnExceptionListener
    * if given exception is a UserRecoverableAuthIOException.
    * @param exception Exception to handle
    */
   private void handleException(Exception exception) {
+    Log.w(TAG, exception);
     if (mOnExceptionListener == null) {
       return;
     }

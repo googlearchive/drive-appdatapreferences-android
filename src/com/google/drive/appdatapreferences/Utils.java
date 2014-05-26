@@ -21,9 +21,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.Set;
 
+import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
+import android.util.Log;
 
 /**
  * Contains several utility functions.
@@ -62,10 +66,9 @@ public class Utils {
    * @param prefs
    * @param changes
    */
-  public static void replaceValues(
-      SharedPreferences prefs, Map<String, Object> changes) {
+  public static boolean replaceValues(SharedPreferences prefs, Map<String, Object> changes) {
     if (changes == null) {
-      return;
+      return false;
     }
 
     // clears the existing values in the preferences
@@ -83,9 +86,26 @@ public class Utils {
         editor.putLong(key, (Long) value);
       } else if (value instanceof String) {
         editor.putString(key, (String) value);
+      } else if (value instanceof Set){
+          setStringSet(editor, key, (Set<String>) value);
+      } else {
+        Log.d(AppdataPreferencesSyncer.TAG, "Unexpected: type=" + value.getClass().getName() + ", " +
+                  "value=" + value.toString() + ". Skipping preference: " + key);
       }
     }
-    editor.commit();
+    return editor.commit();
+  }
+
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+  protected static void setStringSet(Editor editor, String key, Set<String> value) {
+    int apiLevel = Build.VERSION.SDK_INT;
+    if (apiLevel >= 11) {
+      editor.putStringSet(key, value);
+    }
+    else {
+      Log.w(AppdataPreferencesSyncer.TAG, "API Level " + apiLevel + " doesn't support " +
+              "Set<String>. Skipping preference '" + key + "' with value: " + value);
+    }
   }
 
 }
