@@ -32,21 +32,17 @@ public class AppdataPreferencesSyncManager {
   private final Bundle mParams;
 
   /**
-   * Constructs a sync manager for the given account.
-   * @param account The Google account that preferences will be synced to
-   */
-  public AppdataPreferencesSyncManager(Account account) {
-    this(account, new Bundle());
-  }
-
-  /**
    * Constructs a sync manager for the given with the params.
    * @param account The Google account that preferences will be synced to
    * @param params  Parameters
    */
   public AppdataPreferencesSyncManager(Account account, Bundle params) {
     mAccount = account;
-    mParams = params;
+    if(params == null)
+        mParams = new Bundle();
+    else
+        mParams = params;
+    ADPLog.getInstance().setBundle(mParams);
   }
 
   /**

@@ -1,4 +1,6 @@
 bin/*
 gen/*
 proguard-project.txt
+build/*
 build
+*.iml

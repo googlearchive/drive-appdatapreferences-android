@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.os.Bundle;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -161,10 +162,7 @@ public class AppdataPreferencesSyncer {
    * @param credential User's credential
    */
   public void setCredential(GoogleAccountCredential credential) {
-    mCredential = credential;
-    mSyncManager =
-        new AppdataPreferencesSyncManager(credential.getSelectedAccount());
-    mSyncManager.startPeriodicSync();
+      setCredential(credential,null);
   }
 
   /**
@@ -211,7 +209,7 @@ public class AppdataPreferencesSyncer {
    * @throws IOException
    */
   private void updateRemote(String json) throws IOException {
-    Log.d(TAG, "Updating the remote preferences file");
+    ADPLog.d(TAG, "Updating the remote preferences file");
     // update the remote
     new UpdatePreferencesDriveTask(getDriveService()).execute(json);
     mLastSyncedJson = json;
@@ -223,7 +221,7 @@ public class AppdataPreferencesSyncer {
    * @throws IOException
    */
   private void updateLocal() throws IOException {
-    Log.d(TAG, "Updating the local preferences file");
+    ADPLog.d(TAG, "Updating the local preferences file");
     // update the local preferences
     HashMap<String, Object> remoteObj = null;
     String json =
